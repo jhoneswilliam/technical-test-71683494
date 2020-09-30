@@ -1,6 +1,6 @@
 ﻿namespace Domain.DTO.Requests
 {
-    public class GetMultaByDaysLatePayment
+    public class GetMultaByDaysLatePaymentRequest
     {
         public int Days { get; set; }
     }

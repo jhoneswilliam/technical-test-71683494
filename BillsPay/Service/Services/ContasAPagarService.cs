@@ -3,8 +3,9 @@ using Data.Repositories;
 using Domain.DTO.Requests;
 using Domain.DTO.Responses;
 using Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Service.Services
@@ -18,37 +19,39 @@ namespace Service.Services
             MultaService = multaService;
         }
 
-        public async Task<ContaAPagarReponse> GetAll()
+        public async Task<IList<ContaAPagarReponse>> GetAll()
         {
-            var entities = await Repository.GetAll<ContaAPagar>()
-                .AsNoTracking()
-                .FirstOrDefaultAsync();
+            var entities = Repository.GetAll<ContaAPagar>().ToList();
 
-            return Mapper.Map<ContaAPagarReponse>(entities);
+            return Mapper.Map<IList<ContaAPagarReponse>>(entities);
         }
 
         public async Task<ContaAPagarReponse> Create(CreateContaAPagarRequest request)
         {
             var entity = Mapper.Map<ContaAPagar>(request);
+            entity.ValorCorrigido = entity.ValorOriginal;
 
             var diffDays = entity.DataPagamento.Date.Subtract(entity.DataVencimento.Date).TotalDays;
             entity.QuantidadeDiasEmAtraso = Math.Max(Convert.ToInt32(Math.Ceiling(diffDays)), 0);
 
             if (entity.QuantidadeDiasEmAtraso > 0)
             {
-                var punishmentRule = await MultaService.GetByDaysLatePayment(new GetMultaByDaysLatePayment
+                var punishmentRule = await MultaService.GetByDaysLatePayment(new GetMultaByDaysLatePaymentRequest
                 {
                     Days = entity.QuantidadeDiasEmAtraso
                 });
 
-                entity.MultaAplicadaId = punishmentRule.Id;
-                var originalValueDouble = Convert.ToDouble(entity.ValorOriginal);
-                var punishment = punishmentRule.PorcentagemAplicadaMulta * originalValueDouble;
-                var punishmentDays = punishmentRule.PorcentagemAplicadaDiaAtraso
-                    * entity.QuantidadeDiasEmAtraso
-                    * originalValueDouble;
+                if (punishmentRule != null)
+                {
+                    entity.MultaAplicadaId = punishmentRule.Id;
+                    var originalValueDouble = Convert.ToDouble(entity.ValorOriginal);
+                    var punishment = punishmentRule.PorcentagemAplicadaMulta * originalValueDouble;
+                    var punishmentDays = punishmentRule.PorcentagemAplicadaDiaAtraso
+                        * entity.QuantidadeDiasEmAtraso
+                        * originalValueDouble;
 
-                entity.ValorCorrigido = Convert.ToDecimal(originalValueDouble + punishment + punishmentDays);
+                    entity.ValorCorrigido = Convert.ToDecimal(originalValueDouble + punishment + punishmentDays);
+                }
             }
 
             Repository.Add(entity);

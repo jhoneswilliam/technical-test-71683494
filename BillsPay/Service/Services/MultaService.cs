@@ -3,7 +3,6 @@ using Data.Repositories;
 using Domain.DTO.Requests;
 using Domain.DTO.Responses;
 using Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,19 +15,18 @@ namespace Service.Services
 
         }
 
-        public async Task<MultaReponse> GetByDaysLatePayment(GetMultaByDaysLatePayment request)
+        public async Task<MultaReponse> GetByDaysLatePayment(GetMultaByDaysLatePaymentRequest request)
         {
-            var entity = await Repository.GetAll<Multa>()
-                .AsNoTracking()
+            var entity = Repository.GetAll<Multa>()
                 .Where(e => e.PeriodoMaximoDeDiasEmAtraso >= request.Days)
                 .OrderBy(e => e.PeriodoMaximoDeDiasEmAtraso)
-                .FirstOrDefaultAsync();
+                .FirstOrDefault();
 
             if (entity == null)
             {
-                entity = await Repository.GetAll<Multa>()
+                entity = Repository.GetAll<Multa>()
                     .Where(e => e.PeriodoMaximoDeDiasEmAtraso == null)
-                    .FirstOrDefaultAsync();
+                    .FirstOrDefault();
             }
 
             return Mapper.Map<MultaReponse>(entity);

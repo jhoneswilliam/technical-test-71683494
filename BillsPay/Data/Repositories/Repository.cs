@@ -21,7 +21,7 @@ namespace Data.Repositories
             UnityOfWork = unityOfWork;
         }
 
-        public void CreateTrasaction(Action<IDbContextTransaction, UnityOfWork> func)
+        public virtual void CreateTrasaction(Action<IDbContextTransaction, UnityOfWork> func)
         {
             using (var transaction = UnityOfWork.CreateTrasaction())
             {
@@ -37,19 +37,19 @@ namespace Data.Repositories
             }
         }
 
-        public TEntidade Get<TEntidade>(Guid codigo)
+        public virtual TEntidade Get<TEntidade>(Guid codigo)
             where TEntidade : Entity, new()
         {
             return UnityOfWork.Set<TEntidade>().Where(e => e.Id.Equals(codigo)).FirstOrDefault();
         }
 
-        public DbSet<TEntidade> GetAll<TEntidade>()
+        public virtual DbSet<TEntidade> GetAll<TEntidade>()
             where TEntidade : class
         {
             return UnityOfWork.Set<TEntidade>();
         }
 
-        public TEntidade Add<TEntidade>(TEntidade entidade)
+        public virtual TEntidade Add<TEntidade>(TEntidade entidade)
             where TEntidade : class, new()
         {
             if (entidade is Entity && !(entidade as Entity).Id.Equals(default(Guid)))
@@ -65,7 +65,7 @@ namespace Data.Repositories
             return entidade;
         }
 
-        public TEntidade Remove<TEntidade>(TEntidade entidade) where TEntidade : class
+        public virtual TEntidade Remove<TEntidade>(TEntidade entidade) where TEntidade : class
         {
             UnityOfWork.Remove<TEntidade>(entidade);
             UnityOfWork.SaveChanges();
