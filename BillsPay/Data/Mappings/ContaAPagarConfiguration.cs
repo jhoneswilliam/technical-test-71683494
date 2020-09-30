@@ -16,12 +16,12 @@ namespace Data.Mappings
             builder.Property(e => e.ValorCorrigido).IsRequired();
             builder.Property(e => e.QuantidadeDiasEmAtraso).IsRequired();
             builder.Property(e => e.DataPagamento).IsRequired();
+            builder.Property(e => e.DataVencimento).IsRequired();
 
             builder.Property(e => e.MultaAplicadaId);
             builder.HasOne(d => d.MultaAplicada)
-                   .WithMany(p => p.ContaAPagarMultadas)
-                   .HasForeignKey(d => d.MultaAplicadaId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .WithMany()
+                   .HasForeignKey(d => d.MultaAplicadaId);
         }
     }
 }

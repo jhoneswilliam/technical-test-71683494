@@ -2,6 +2,7 @@ using Api.ActionFilters;
 using Api.CrossCutting.DependencyInjection;
 using AutoMapper;
 using CrossCutting.AutoMapper;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -29,7 +30,7 @@ namespace Api
 
         public void ConfigureServices(IServiceCollection services)
         {            
-            services.AddControllers(options => options.Filters.Add(new HttpResponseExceptionFilter()))
+            services.AddControllers(options => options.Filters.Add(new HttpResponseExceptionFilter()))                    
                     .AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -39,7 +40,8 @@ namespace Api
             services.AddLogging(config => config.AddConsole());
 
             services.AddSingleton(new MapperConfiguration(mc =>
-            {
+            {                
+                mc.AddProfile(new AutoMapperRequestProfile());
                 mc.AddProfile(new AutoMapperResponsesProfile());
             }).CreateMapper());
 
@@ -51,6 +53,7 @@ namespace Api
             });
 
             services.AddMvcCore()
+                  .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>())
                   .AddMvcOptions(x =>
                   {
                       x.EnableEndpointRouting = false;

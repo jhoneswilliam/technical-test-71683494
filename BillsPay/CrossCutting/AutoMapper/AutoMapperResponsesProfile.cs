@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Domain.DTO.Responses;
+using Domain.Entities;
 
 namespace CrossCutting.AutoMapper
 {
@@ -6,7 +8,8 @@ namespace CrossCutting.AutoMapper
     {
         public AutoMapperResponsesProfile()
         {
-            
+            CreateMap<ContaAPagar, ContaAPagarReponse>();
+            CreateMap<Multa, MultaReponse>();            
         }
     }
 }

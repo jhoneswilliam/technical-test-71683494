@@ -1,4 +1,5 @@
 ﻿using Domain.DTO.Requests;
+using Domain.DTO.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Service.Services;
 using System.Threading.Tasks;
@@ -9,11 +10,25 @@ namespace Api.Controllers
     [Route("api/[controller]")]
     public class ContasAPagarController : ControllerBase
     {
-        private ContasAPagarService Service { get; set; }
+        private ContasAPagarService ContasAPagarService { get; set; }
 
-        public ContasAPagarController(ContasAPagarService service)
+        public ContasAPagarController(ContasAPagarService contasAPagarService)
         {
-            Service = service;
-        }       
+            ContasAPagarService = contasAPagarService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var result = await ContasAPagarService.GetAll();
+            return Ok(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateContaAPagarRequest request)
+        {
+            var result = await ContasAPagarService.Create(request);
+            return Ok(result);
+        }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Domain.DTO.Requests;
+using Domain.Entities;
 
 namespace CrossCutting.AutoMapper
 {
@@ -6,7 +8,7 @@ namespace CrossCutting.AutoMapper
     {
         public AutoMapperRequestProfile()
         {
-
+            CreateMap<CreateContaAPagarRequest, ContaAPagar>();
         }
     }
 }
